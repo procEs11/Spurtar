@@ -9,57 +9,65 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <style>
-        body {
-            background: linear-gradient(to top, #001f3d, #003366);
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Arial', sans-serif;
-            color: white;
-        }
+    body {
+        background: radial-gradient(circle, #001f3d 0%, #000000 100%);
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Arial', sans-serif;
+        color: white;
+    }
 
-        .user-info-container {
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-        }
+    .user-info-container {
+        background-color: rgba(0, 0, 0, 0.8);
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        text-align: center;
+        width: 100%;
+        max-width: 400px;
+        margin: 20px;
+        margin-top: 25px;
+        border: 3px solid #ffffff;
+    }
 
-        h1 {
-            font-size: 30px;
-            margin-bottom: 20px;
-        }
+    h1 {
+        font-size: 32px;
+        margin-bottom: 20px;
+        text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.7);
+    }
 
-        .user-info {
-            font-size: 18px;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
+    .user-info {
+        font-size: 18px;
+        margin-bottom: 20px;
+        font-weight: bold;
+        text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.7);
+    }
 
-        button {
-            padding: 12px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+    button {
+        padding: 12px 20px;
+        background-color: rgba(0, 0, 255, 0.6);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0px 0px 15px rgba(0, 0, 255, 0.7);
+    }
 
-        button:hover {
-            background-color: #45a049;
-        }
+    button:hover {
+        background-color: rgba(0, 0, 255, 0.8);
+    }
 
-        button:active {
-            transform: scale(0.98);
-        }
-    </style>
+    button:active {
+        transform: scale(0.98);
+        background-color: rgba(0, 0, 255, 0.9);
+    }
+</style>
+
 </head>
 <body>
 
@@ -73,66 +81,51 @@
 
         <button onclick="downloadLoader()">Скачать лоадер</button>
     </div>
-<script>
-    function downloadLoader() {
-        const loaderUrl = "https://workupload.com/file/mSNDCmDKy96"; // ЗАМЕНИ ЭТО НА СВОЮ ССЫЛКУ
-        const link = document.createElement("a");
-        link.href = loaderUrl;
-        link.download = "loader.exe"; // Имя файла при скачивании
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-</script>
 
-  <script>
-    // Инициализация Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyCZZLFBbML7tzzeyQG6AScA97W28IU-Oc4",
-        authDomain: "baseloader-9de04.firebaseapp.com",
-        databaseURL: "https://baseloader-9de04-default-rtdb.firebaseio.com",
-        projectId: "baseloader-9de04",
-        storageBucket: "baseloader-9de04.firebasestorage.app",
-        messagingSenderId: "226103802342",
-        appId: "1:226103802342:web:9d2f5839403e1ad1287e27"
-    };
+    <script>
+        // Инициализация Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCZZLFBbML7tzzeyQG6AScA97W28IU-Oc4",
+            authDomain: "baseloader-9de04.firebaseapp.com",
+            databaseURL: "https://baseloader-9de04-default-rtdb.firebaseio.com",
+            projectId: "baseloader-9de04",
+            storageBucket: "baseloader-9de04.firebasestorage.app",
+            messagingSenderId: "226103802342",
+            appId: "1:226103802342:web:9d2f5839403e1ad1287e27"
+        };
 
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-    // Проверяем, есть ли никнейм в localStorage
-    const userNickname = localStorage.getItem("nickname");
-    console.log("Найденный nickname в localStorage:", userNickname);
+        // Проверка роли пользователя
+        const userNickname = localStorage.getItem("nickname");
 
-    if (!userNickname) {
-        console.error("Ошибка: `nickname` не найден в localStorage!");
-        alert("Ошибка: `nickname` не найден. Авторизуйтесь снова.");
-    } else {
-        console.log("Отправляем запрос в Firebase для:", userNickname);
+        if (!userNickname) {
+            alert("Ошибка: nickname не найден. Авторизуйтесь снова.");
+            window.location.href = "index.html";
+        } else {
+            database.ref("users").orderByChild("nickname").equalTo(userNickname).once("value")
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        const userData = Object.values(snapshot.val())[0];
+                        document.getElementById("user-nickname").textContent = userData.nickname || "Неизвестный";
+                        document.getElementById("user-role").textContent = userData.role || "Пользователь";
+                    } else {
+                        alert("Ошибка: пользователь не найден.");
+                    }
+                })
+                .catch(error => alert("Ошибка при получении данных: " + error.message));
+        }
 
-        database.ref("users").orderByChild("nickname").equalTo(userNickname).once("value")
-            .then(snapshot => {
-                console.log("Ответ от Firebase:", snapshot.val());
-
-                if (snapshot.exists()) {
-                    const userData = Object.values(snapshot.val())[0]; // Получаем первый объект
-                    console.log("Данные пользователя:", userData);
-
-                    document.getElementById("user-nickname").textContent = userData.nickname || "Неизвестный";
-                    document.getElementById("user-role").textContent = userData.role || "Пользователь";
-                } else {
-                    console.warn("Ошибка: Пользователь с таким никнеймом не найден в Firebase.");
-                    alert("Ошибка: пользователь не найден.");
-                }
-            })
-            .catch(error => {
-                console.error("Ошибка при запросе к Firebase:", error);
-                alert("Ошибка при получении данных.");
-            });
-    }
-</script>
-
-
-
+        function downloadLoader() {
+            const loaderUrl = "https://workupload.com/file/mSNDCmDKy96";
+            const link = document.createElement("a");
+            link.href = loaderUrl;
+            link.download = "loader.exe";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
 </body>
 </html>
